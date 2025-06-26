@@ -15,13 +15,22 @@ class NetworkMonitor {
 
     func getSpeed() -> Speed {
         let current = getNetworkBytes()
+
+        guard lastReceived <= current.received,
+              lastSent <= current.sent else {
+            lastReceived = current.received
+            lastSent = current.sent
+            return Speed(download: "0 KB/s", upload: "0 KB/s")
+        }
+
         let downSpeed = current.received - lastReceived
         let upSpeed = current.sent - lastSent
 
         lastReceived = current.received
         lastSent = current.sent
 
-        return Speed(download: formatBytes(bytes: downSpeed), upload: formatBytes(bytes: upSpeed))
+        return Speed(download: formatBytes(bytes: downSpeed),
+                     upload: formatBytes(bytes: upSpeed))
     }
 
     private func updateStats() {
